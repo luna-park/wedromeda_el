@@ -1,10 +1,9 @@
 package org.lunapark.develop.wedromedael;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.lunapark.develop.wedromedael.contacts.WedroContacts;
+import org.lunapark.develop.wedromedael.db.WedroDatabase;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,30 +15,36 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ExpandableListView;
-import android.widget.SimpleExpandableListAdapter;
 
 public class MainActivity extends Activity implements OnItemClickListener {
-
-	// названия проектов (групп)
-	String[] groups = new String[] { "Проект 1", "Проект 2", " Проект 3" };
-
-	// названия пунктов проекта (элементов)
-	String[] elementNames = new String[] { "Sensation", "Desire", "Wildfire",
-			"Hero" };
 	
+	//private String[] titleProjects = {"Проект 1", "Проект 4", "Проект 3", "Проект 7", "Проект 5"};
+	private ArrayList<String> listProjects;
+	private WedroDatabase databaseHelper = new WedroDatabase();
+	
+	String[] titleElements = null;
+	/*
+	// названия компаний (групп)
+	  String[] groups = new String[] {"HTC", "Samsung", "LG"};
+	  
+	  // названия телефонов (элементов)
+	  String[] phonesHTC = new String[] {"Sensation", "Desire", "Wildfire", "Hero"};
+	  String[] phonesSams = new String[] {"Galaxy S II", "Galaxy Nexus", "Wave"};
+	  String[] phonesLG = new String[] {"Optimus", "Optimus Link", "Optimus Black", "Optimus One"};
+	  
+	  // коллекция для групп
+	  ArrayList<Map<String, String>> groupData;
+	  
+	  // коллекция для элементов одной группы
+	  ArrayList<Map<String, String>> childDataItem;
 
-	// коллекция для групп
-	ArrayList<Map<String, String>> groupData;
-
-	// коллекция для элементов одной группы
-	ArrayList<Map<String, String>> childDataItem;
-
-	// общая коллекция для коллекций элементов
-	ArrayList<ArrayList<Map<String, String>>> childData;
-	// в итоге получится childData = ArrayList<childDataItem>
-
-	// список аттрибутов группы или элемента
-	Map<String, String> m;
+	  // общая коллекция для коллекций элементов
+	  ArrayList<ArrayList<Map<String, String>>> childData;
+	  // в итоге получится childData = ArrayList<childDataItem>
+	  
+	  // список аттрибутов группы или элемента
+	  Map<String, String> m;
+	  */
 
 	ExpandableListView elvMain;
 
@@ -50,8 +55,18 @@ public class MainActivity extends Activity implements OnItemClickListener {
 
 		// Contacts
 		Intent intent = new Intent(this, WedroContacts.class);
-		startActivity(intent);
+		//startActivity(intent);
 		
+		// Add project titles to list
+		listProjects = new ArrayList<String>();			
+		listProjects.addAll(databaseHelper.getTitleProjects());
+		
+		for (String str : listProjects) {
+			Log.e("Wedro", str);
+		}
+		
+		
+/*		
 		// заполняем коллекцию групп из массива с названиями групп
 		groupData = new ArrayList<Map<String, String>>();
 		for (String group : groups) {
@@ -80,7 +95,7 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		}
 		// добавляем в коллекцию коллекций
 		childData.add(childDataItem);
-/*
+
 		// создаем коллекцию элементов для второй группы
 		childDataItem = new ArrayList<Map<String, String>>();
 		for (String phone : phonesSams) {
@@ -98,12 +113,13 @@ public class MainActivity extends Activity implements OnItemClickListener {
 			childDataItem.add(m);
 		}
 		childData.add(childDataItem);
-*/
+
 		// список аттрибутов элементов для чтения
 		String childFrom[] = new String[] { "phoneName" };
 		// список ID view-элементов, в которые будет помещены аттрибуты
 		// элементов
 		int childTo[] = new int[] { android.R.id.text1 };
+
 
 		SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
 				this, groupData,
@@ -114,6 +130,8 @@ public class MainActivity extends Activity implements OnItemClickListener {
 		elvMain = (ExpandableListView) findViewById(R.id.elvMain);
 		elvMain.setAdapter(adapter);
 		elvMain.setOnItemClickListener(this);
+		
+		*/
 	}
 
 	@Override
