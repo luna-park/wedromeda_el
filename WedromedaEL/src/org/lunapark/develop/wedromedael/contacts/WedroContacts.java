@@ -38,6 +38,7 @@ public class WedroContacts extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts_activity);
+		setTitle(getString(R.string.title_contacts));
 
 		lvContacts = (ListView) findViewById(R.id.lvContacts);
 		tvName = (TextView) findViewById(R.id.tvContact);

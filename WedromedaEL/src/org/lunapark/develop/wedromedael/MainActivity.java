@@ -1,137 +1,148 @@
 package org.lunapark.develop.wedromedael;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.lunapark.develop.wedromedael.contacts.WedroContacts;
 import org.lunapark.develop.wedromedael.db.WedroDatabase;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.SimpleExpandableListAdapter;
 
-public class MainActivity extends Activity implements OnItemClickListener {
-	
-	//private String[] titleProjects = {"Проект 1", "Проект 4", "Проект 3", "Проект 7", "Проект 5"};
+public class MainActivity extends Activity implements OnChildClickListener {
+		
 	private ArrayList<String> listProjects;
-	private WedroDatabase databaseHelper = new WedroDatabase();
+	WedroDatabase databaseHelper;
 	
-	String[] titleElements = null;
-	/*
-	// названия компаний (групп)
-	  String[] groups = new String[] {"HTC", "Samsung", "LG"};
-	  
-	  // названия телефонов (элементов)
-	  String[] phonesHTC = new String[] {"Sensation", "Desire", "Wildfire", "Hero"};
-	  String[] phonesSams = new String[] {"Galaxy S II", "Galaxy Nexus", "Wave"};
-	  String[] phonesLG = new String[] {"Optimus", "Optimus Link", "Optimus Black", "Optimus One"};
-	  
-	  // коллекция для групп
-	  ArrayList<Map<String, String>> groupData;
-	  
-	  // коллекция для элементов одной группы
-	  ArrayList<Map<String, String>> childDataItem;
-
-	  // общая коллекция для коллекций элементов
-	  ArrayList<ArrayList<Map<String, String>>> childData;
-	  // в итоге получится childData = ArrayList<childDataItem>
-	  
-	  // список аттрибутов группы или элемента
-	  Map<String, String> m;
-	  */
+	// коллекция для групп
+	ArrayList<Map<String, String>> dataProjects;
+	// общая коллекция для коллекций элементов
+	ArrayList<ArrayList<Map<String, String>>> childData;
+	// коллекция для элементов одной группы
+	ArrayList<Map<String, String>> childDataItem;
+	
+	// список аттрибутов группы или элемента
+	Map<String, String> m;
+	
+	
+	
+	
 
 	ExpandableListView elvMain;
+	
+	/**
+	 * Выход из программы
+	 */
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		// Handle the back button
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// Ask the user if they want to quit
+			new AlertDialog.Builder(this)
+					// .setIcon(android.R.drawable.ic_dialog_alert)
+					.setTitle(getString(R.string.app_name))
+					.setMessage(getString(R.string.title_quit))
+					.setPositiveButton(android.R.string.yes,
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									finish();
+								}
+
+							}).setNegativeButton(android.R.string.no, null)
+					.show();
+
+			return true;
+		} else {
+			return super.onKeyDown(keyCode, event);
+		}
+
+	}
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+		
+		elvMain = (ExpandableListView) findViewById(R.id.elvMain);
+		elvMain.setOnChildClickListener(this);
 
-		// Contacts
-		Intent intent = new Intent(this, WedroContacts.class);
-		//startActivity(intent);
+		
 		
 		// Add project titles to list
-		listProjects = new ArrayList<String>();			
+		listProjects = new ArrayList<String>();
+		databaseHelper = new WedroDatabase();		
 		listProjects.addAll(databaseHelper.getTitleProjects());
+		
+		
+		dataProjects =new ArrayList<Map<String, String>>();
+		
+		
+		String groupProjectTag = "projectName";
+		String groupElementTag = "elementName";
+		String[] titleElements = new String[] {
+				getString(R.string.title_task),
+				getString(R.string.title_contacts),
+				getString(R.string.title_notes),
+				getString(R.string.title_events)
+				};
 		
 		for (String str : listProjects) {
 			Log.e("Wedro", str);
-		}
-		
-		
-/*		
-		// заполняем коллекцию групп из массива с названиями групп
-		groupData = new ArrayList<Map<String, String>>();
-		for (String group : groups) {
-			// заполняем список аттрибутов для каждой группы
 			m = new HashMap<String, String>();
-			m.put("groupName", group); // имя компании
-			groupData.add(m);
+			m.put(groupProjectTag, str); // Project name
+			dataProjects.add(m);
 		}
-
-		// список аттрибутов групп для чтения
-		String groupFrom[] = new String[] { "groupName" };
-		// список ID view-элементов, в которые будет помещены аттрибуты
-		// групп
+		
+		String groupFrom[] = new String[] { groupProjectTag };
 		int groupTo[] = new int[] { android.R.id.text1 };
-
-		// создаем коллекцию для коллекций элементов
 		childData = new ArrayList<ArrayList<Map<String, String>>>();
-
+		
 		// создаем коллекцию элементов для первой группы
-		childDataItem = new ArrayList<Map<String, String>>();
-		// заполняем список аттрибутов для каждого элемента
-		for (String phone : elementNames) {
-			m = new HashMap<String, String>();
-			m.put("phoneName", phone); // название телефона
-			childDataItem.add(m);
+		
+		        
+		for (int i = 0; i < listProjects.size(); i++) {
+			// заполняем список аттрибутов для каждого элемента
+			childDataItem = new ArrayList<Map<String, String>>();
+			for (String elements : titleElements) {
+				m = new HashMap<String, String>();
+				m.put(groupElementTag, elements); // название пункта
+				childDataItem.add(m);
+			}
+			// добавляем в коллекцию коллекций
+			childData.add(childDataItem);
 		}
-		// добавляем в коллекцию коллекций
-		childData.add(childDataItem);
-
-		// создаем коллекцию элементов для второй группы
-		childDataItem = new ArrayList<Map<String, String>>();
-		for (String phone : phonesSams) {
-			m = new HashMap<String, String>();
-			m.put("phoneName", phone);
-			childDataItem.add(m);
-		}
-		childData.add(childDataItem);
-
-		// создаем коллекцию элементов для третьей группы
-		childDataItem = new ArrayList<Map<String, String>>();
-		for (String phone : phonesLG) {
-			m = new HashMap<String, String>();
-			m.put("phoneName", phone);
-			childDataItem.add(m);
-		}
-		childData.add(childDataItem);
-
+		
 		// список аттрибутов элементов для чтения
-		String childFrom[] = new String[] { "phoneName" };
+		String childFrom[] = new String[] { groupElementTag };
 		// список ID view-элементов, в которые будет помещены аттрибуты
 		// элементов
 		int childTo[] = new int[] { android.R.id.text1 };
-
-
+		
 		SimpleExpandableListAdapter adapter = new SimpleExpandableListAdapter(
-				this, groupData,
+				this, dataProjects,
 				android.R.layout.simple_expandable_list_item_1, groupFrom,
 				groupTo, childData, android.R.layout.simple_list_item_1,
 				childFrom, childTo);
 
-		elvMain = (ExpandableListView) findViewById(R.id.elvMain);
-		elvMain.setAdapter(adapter);
-		elvMain.setOnItemClickListener(this);
 		
-		*/
+		elvMain.setAdapter(adapter);
+		
+
 	}
 
 	@Override
@@ -155,11 +166,24 @@ public class MainActivity extends Activity implements OnItemClickListener {
 	}
 
 	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position,
-			long id) {
-		Log.e("Wedromeda", "position: " + position);
-		Log.e("Wedromeda", "id: " + id);
+	public boolean onChildClick(ExpandableListView parent, View v,
+			int groupPosition, int childPosition, long id) {
+		// TODO 
+		Log.e("Wedro", "Group: " + groupPosition + " child: " + childPosition + " id: " + id);
 		
+		switch (childPosition) {
+		case 1:
+			// Contacts
+			Intent intent = new Intent(this, WedroContacts.class);
+			startActivity(intent);
+			break;
+
+		default:
+			break;
+		}
+		return false;
 	}
+
+	
 
 }
